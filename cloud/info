@@ -1,0 +1,25 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------
+set -euo pipefail # Stop running the script on first error...
+# -----------------------------------------------------------------------------
+# Set up a cluster according to the environment
+# -----------------------------------------------------------------------------
+# Load env vars from file `../aws.env`
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source $DIR/../.env
+
+jq . << EOF
+{
+    "project": "${PROJECT}",
+    "version": "${VERSION}",
+    "cluster": {        
+        "vendor": "${CLOUD_PROVIDER}",
+        "target": "${CLUSTER_TARGET}",
+        "region": "${CLUSTER_REGION}"
+    },
+    "publish": {
+        "registry": "${REGISTRY}",
+        "artifact": "${ARTIFACT}"
+    }
+}
+EOF

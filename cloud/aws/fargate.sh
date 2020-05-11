@@ -16,7 +16,7 @@ source ~/.aws/mfa
 
 
 # Create a AWS EKS cluster if not exists
-FARGATE_TARGET=${EKS_TARGET}-serverless
+FARGATE_TARGET=${CLUSTER_TARGET}-serverless
 if aws eks describe-cluster --name ${FARGATE_TARGET} 2> /dev/null | jq .cluster.endpoint
 then
     # The cluster was detected, skip...
@@ -26,7 +26,7 @@ else
     # Create a new EKS Cluster (single node)
     eksctl create cluster \
     --name ${FARGATE_TARGET} \
-    --region ${AWS_REGION} \
+    --region ${CLUSTER_REGION} \
     --fargate
     # This will also switch your kubectl command to the new cluster
 fi

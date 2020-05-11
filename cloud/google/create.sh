@@ -13,16 +13,16 @@ source $DIR/../../config/google.env
 
 
 # Login to Google account and set up project
-if gcloud projects list | grep ${GCP_PROJECT} 2>&1 > /dev/null
+if gcloud projects list | grep ${GOOGLE_PROJECT} 2>&1 > /dev/null
 then
     echo "Project already exists"
     gcloud projects list --format json \
-    | jq -c "map(select(.projectId | contains(\"${GCP_PROJECT}\")) )" \
+    | jq -c "map(select(.projectId | contains(\"${GOOGLE_PROJECT}\")) )" \
     | jq -r '.[]'
 else
-    gcloud projects create ${GCP_PROJECT}
+    gcloud projects create ${GOOGLE_PROJECT}
 fi
-gcloud init --project ${GCP_PROJECT}
+gcloud init --project ${GOOGLE_PROJECT}
 
 
 # Initialise gcr.io container registry (if not already registered)
@@ -35,16 +35,16 @@ fi
 
 
 # Create a new GKE Cluster (2 nodes) if not exists
-if gcloud container clusters list --region ${GCP_REGION} | grep ${GKE_TARGET} 2>&1 > /dev/null
+if gcloud container clusters list --region ${CLUSTER_REGION} | grep ${CLUSTER_TARGET} 2>&1 > /dev/null
 then
-  echo "Cluster found: ${GKE_TARGET}"
+  echo "Cluster found: ${CLUSTER_TARGET}"
 else
-  gcloud container clusters create ${GKE_TARGET} --region ${GCP_REGION} --num-nodes 2
+  gcloud container clusters create ${CLUSTER_TARGET} --region ${CLUSTER_REGION} --num-nodes 2
 fi
 
 
 # Scale to [n] nodes if needed
-gcloud container clusters resize ${GKE_TARGET} --region ${GCP_REGION} --num-nodes 1
+gcloud container clusters resize ${CLUSTER_TARGET} --region ${CLUSTER_REGION} --num-nodes 1
 
 
 kubectl get nodes

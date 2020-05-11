@@ -16,18 +16,18 @@ source ~/.aws/mfa
 
 
 # Delete a AWS EKS cluster if exists
-if aws eks describe-cluster --name ${EKS_TARGET} 2> /dev/null | jq .cluster.endpoint
+if aws eks describe-cluster --name ${CLUSTER_TARGET} 2> /dev/null | jq .cluster.endpoint
 then
     eksctl delete cluster \
-    --name ${EKS_TARGET} \
-    --region ${AWS_REGION}
+    --name ${CLUSTER_TARGET} \
+    --region ${CLUSTER_REGION}
 fi
 
 
 # Create an AWS ECR image repository to store a docker image (if it does not exists)
-if aws ecr describe-repositories --repository-names ${ECR_TARGET} 2> /dev/null | jq -r '.repositories[].repositoryUri'
+if aws ecr describe-repositories --repository-names ${ARTIFACT} 2> /dev/null | jq -r '.repositories[].repositoryUri'
 then
-    aws ecr delete-repository --repository-name ${ECR_TARGET} --force | jq -r '.repositories[].repositoryUri'
+    aws ecr delete-repository --repository-name ${ARTIFACT} --force | jq -r '.repositories[].repositoryUri'
 fi
 
 

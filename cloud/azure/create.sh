@@ -26,40 +26,40 @@ az account set --subscription "Free Trial"
 az account list-locations | jq -r ".[] | .name"
 
 # Create our resource group where we will deploy our app
-az group create --name ${AZ_RESOURCE} --location ${AZ_LOCATION}
+az group create --name ${CLUSTER_TARGET} --location ${CLUSTER_REGION}
 
 # Create an Azure ACR registry to store docker containers
 az acr create \
-    --location ${AZ_LOCATION} \
-    --resource-group ${AZ_RESOURCE} \
-    --name ${ACR_TARGET} \
+    --location ${CLUSTER_REGION} \
+    --resource-group ${CLUSTER_TARGET} \
+    --name ${CLUSTER_TARGET} \
     --sku "Basic" \
   | jq .provisioningState
 
 # Login to ACR registry
-az acr login --name ${ACR_TARGET}
+az acr login --name ${CLUSTER_TARGET}
 
 # Create a new AKS Cluster (single node)
 az aks create \
-    --name ${AKS_TARGET} \
-    --resource-group ${AZ_RESOURCE} \
+    --name ${CLUSTER_TARGET} \
+    --resource-group ${CLUSTER_TARGET} \
     --node-vm-size="Standard_A4m_v2" \
     --node-count 1 \
  | jq .provisioningState
 
 # Assign a role to allow image pulls from our new cluster
 az role assignment create \
-    --assignee $(az aks show --query servicePrincipalProfile.clientId -n ${AKS_TARGET} -g ${AZ_RESOURCE} -o tsv) \
-    --scope $(az acr show --query id -n ${ACR_TARGET} -g ${AZ_RESOURCE} -o tsv) \
+    --assignee $(az aks show --query servicePrincipalProfile.clientId -n ${CLUSTER_TARGET} -g ${CLUSTER_TARGET} -o tsv) \
+    --scope $(az acr show --query id -n ${CLUSTER_TARGET} -g ${CLUSTER_TARGET} -o tsv) \
     --role "acrpull" \
  | jq .scope
 
 # Enable monitoring on the cluster
-az aks enable-addons -a monitoring --name ${AKS_TARGET} --resource-group ${AZ_RESOURCE} | jq .fqdn || true
+az aks enable-addons -a monitoring --name ${CLUSTER_TARGET} --resource-group ${CLUSTER_TARGET} | jq .fqdn || true
 
 # Configure local kubectl to connect to our AKS cluster
-az aks get-credentials --name ${AKS_TARGET} --resource-group ${AZ_RESOURCE}
+az aks get-credentials --name ${CLUSTER_TARGET} --resource-group ${CLUSTER_TARGET}
 
 # Scale to [n] nodes if needed
-az aks scale -c 1 -g ${AZ_RESOURCE} -n ${AKS_TARGET} | jq .fqdn
+az aks scale -c 1 -g ${CLUSTER_TARGET} -n ${CLUSTER_TARGET} | jq .fqdn
 kubectl get nodes

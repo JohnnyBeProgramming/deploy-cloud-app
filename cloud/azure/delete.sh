@@ -14,10 +14,10 @@ az --version
 az login
 
 # Delete the AKS Cluster 
-az aks delete -n ${AKS_TARGET} -g ${AZ_RESOURCE}
+az aks delete -n ${CLUSTER_TARGET} -g ${CLUSTER_TARGET}
 
 # Delete the ACR Image Repository
-az acr repository delete -n ${ACR_TARGET} --repository "demo/demo-app"
+az acr repository delete -n ${CLUSTER_TARGET} --repository ${ARTIFACT}
 
 # Delete the entire resource group
-az group delete -n ${AZ_RESOURCE}
+az group delete -n ${CLUSTER_TARGET}

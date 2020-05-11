@@ -16,31 +16,31 @@ source ~/.aws/mfa
 
 
 # Login to AWS container registries
-$(aws ecr get-login --region ${AWS_REGION} --no-include-email)
+$(aws ecr get-login --region ${CLUSTER_REGION} --no-include-email)
 
 
 # Create an AWS ECR image repository to store a docker image (if it does not exists)
-if aws ecr describe-repositories --repository-names ${ECR_TARGET} 2> /dev/null
+if aws ecr describe-repositories --repository-names ${ARTIFACT} 2> /dev/null
 then
     # The image repository already exists
-    export AWS_REGISTRY=$(aws ecr describe-repositories --repository-names ${ECR_TARGET} 2> /dev/null | jq -r '.repositories[].repositoryUri' || echo '')
+    REGISTRY=$(aws ecr describe-repositories --repository-names ${ARTIFACT} 2> /dev/null | jq -r '.repositories[].repositoryUri' || echo '')
 else
     # Create a new repository for this image
-    export AWS_REGISTRY=$(aws ecr create-repository --repository-name ${ECR_TARGET} | jq .repository.repositoryUri)
+    REGISTRY=$(aws ecr create-repository --repository-name ${ARTIFACT} | jq .repository.repositoryUri)
 fi
 
 
 # Create a AWS EKS cluster if not exists
-if aws eks describe-cluster --name ${EKS_TARGET} 2> /dev/null | jq .cluster.endpoint 
+if aws eks describe-cluster --name ${CLUSTER_TARGET} 2> /dev/null | jq .cluster.endpoint 
 then
     # The cluster was detected, skip...
     echo " - Check your kube context '$(kubectl config current-context)' is correct."
-    echo " - Warning: Cluster '${EKS_TARGET}' already exists."
+    echo " - Warning: Cluster '${CLUSTER_TARGET}' already exists."
 else
     # Create a new EKS Cluster (single node)
     eksctl create cluster \
-    --name ${EKS_TARGET} \
-    --region ${AWS_REGION} \
+    --name ${CLUSTER_TARGET} \
+    --region ${CLUSTER_REGION} \
     --nodes 2 \
     --nodes-min 1 \
     --nodes-max 3
@@ -49,8 +49,8 @@ fi
 
 
 # Scale to [n] nodes if needed
-NODE_GROUP=$(eksctl get nodegroup --cluster=${EKS_TARGET} -o=json | jq -r '.[].Name')
-eksctl scale nodegroup --cluster=${EKS_TARGET} --nodes=1 --name=${NODE_GROUP}
+NODE_GROUP=$(eksctl get nodegroup --cluster=${CLUSTER_TARGET} -o=json | jq -r '.[].Name')
+eksctl scale nodegroup --cluster=${CLUSTER_TARGET} --nodes=1 --name=${NODE_GROUP}
 
 kubectl get nodes
 
