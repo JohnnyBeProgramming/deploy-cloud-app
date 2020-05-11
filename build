@@ -1,0 +1,8 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------
+set -euo pipefail # Stop running the script on first error...
+# -----------------------------------------------------------------------------
+source .env
+pushd ./app
+
+docker build -t ${REGISTRY}/${IMAGE_ID} .
