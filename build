@@ -8,7 +8,7 @@ pushd ./app > /dev/null
 case ${CLOUD_PROVIDER:-} in
   azure)
     # Building images using the Azure Cloud
-    az acr build -t ${IMAGE_ID} -r ${ACR_NAME} -f Dockerfile .
+    az acr build -t ${IMAGE_ID} -r ${ACR_TARGET} -f Dockerfile .
     ;;
   aws)
     # Building images using the AWS Cloud
@@ -16,7 +16,7 @@ case ${CLOUD_PROVIDER:-} in
     ;;
   google)
     # Building images using the Google Cloud
-    exit 1;
+    docker build -t ${REGISTRY}/${IMAGE_ID} .
     ;;
   *)
     # Default: Build image using local docker

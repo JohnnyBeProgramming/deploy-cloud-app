@@ -5,10 +5,9 @@ set -euo pipefail # Stop running the script on first error...
 # Register an Azure account for free:
 #  - http://azure.microsoft.com/
 # -----------------------------------------------------------------------------
-AZ_LOCATION="westeurope"
-AZ_RESOURCE="kube-demo"
-AKS_TARGET="azurejohnny"
-ACR_TARGET="azurejohnny"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source $DIR/../../config/azure.env
+
 
 # Login to Azure account
 az --version
