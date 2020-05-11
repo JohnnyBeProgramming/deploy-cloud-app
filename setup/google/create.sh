@@ -2,29 +2,49 @@
 # -----------------------------------------------------------------------------
 set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
-# Register an Azure account for free:
-#  - http://azure.microsoft.com/
+# Register an Google Cloud account for free:
+#  - http://cloud.google.com/
 # -----------------------------------------------------------------------------
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source $DIR/../../config/google.env
 
-
-# Login to Google account
-
-
-# Create an image registry to store docker containers
+# Initialise tooling
+# curl https://sdk.cloud.google.com | bash
 
 
-# Login to container registry
+# Login to Google account and set up project
+if gcloud projects list | grep ${GCP_PROJECT} 2>&1 > /dev/null
+then
+    echo "Project already exists"
+    gcloud projects list --format json \
+    | jq -c "map(select(.projectId | contains(\"${GCP_PROJECT}\")) )" \
+    | jq -r '.[]'
+else
+    gcloud projects create ${GCP_PROJECT}
+fi
+gcloud init --project ${GCP_PROJECT}
 
 
-# Create a new GKE Cluster (single node)
+# Initialise gcr.io container registry (if not already registered)
+if cat ~/.docker/config.json | jq .credHelpers | grep gcr.io 2>&1 > /dev/null
+then
+    echo "Registry found: gcr.io"
+else
+    gcloud auth configure-docker
+fi
 
-# Configure local kubectl to connect to our AKS cluster
+
+# Create a new GKE Cluster (2 nodes) if not exists
+if gcloud container clusters list --region ${GCP_REGION} | grep ${GKE_TARGET} 2>&1 > /dev/null
+then
+  echo "Cluster found: ${GKE_TARGET}"
+else
+  gcloud container clusters create ${GKE_TARGET} --region ${GCP_REGION} --num-nodes 2
+fi
 
 
 # Scale to [n] nodes if needed
-
+gcloud container clusters resize ${GKE_TARGET} --region ${GCP_REGION} --num-nodes 1
 
 
 kubectl get nodes
