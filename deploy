@@ -4,17 +4,6 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
 
-# Deploy a sample project
-kubectl create deployment ${PROJECT} --image=${REGISTRY}/${IMAGE_ID} --dry-run=true -o yaml | kubectl apply --wait -f -
-kubectl expose deployment ${PROJECT} --type=LoadBalancer --port 5000 --target-port 5000 --dry-run=true -o yaml | kubectl apply --wait -f -
+kubectl create deployment ${PROJECT} --image=${REGISTRY}/${IMAGE_ID} --dry-run=true -o yaml | kubectl apply -f -
+kubectl expose deployment ${PROJECT} --type=LoadBalancer --port 5000 --target-port 5000 --dry-run=true -o yaml | kubectl apply -f -
 kubectl get service
-
-# Scale it up to multiple replicas
-kubectl scale deployment ${PROJECT} --replicas=3 -o yaml | kubectl apply --wait -f -
-kubectl wait --for=condition=available --timeout=600s deployment/${PROJECT} -n default
-kubectl get pods
-
-# Scale it back down to one
-kubectl scale deployment ${PROJECT} --replicas=1 -o yaml | kubectl apply --wait -f -
-kubectl wait --for=condition=available --timeout=600s deployment/${PROJECT} -n default
-kubectl get pods
