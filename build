@@ -10,11 +10,11 @@ case ${CLOUD_PROVIDER:-} in
     # Building images using the Azure Cloud
     az acr build -t ${IMAGE_ID} -r ${ACR_NAME} -f Dockerfile .
     ;;
-  down)
+  aws)
     # Building images using the AWS Cloud
-    exit 1;
+    docker build -t ${REGISTRY}/${IMAGE_ID} .
     ;;
-  test)
+  google)
     # Building images using the Google Cloud
     exit 1;
     ;;
