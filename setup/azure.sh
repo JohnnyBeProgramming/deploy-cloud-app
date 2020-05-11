@@ -61,9 +61,6 @@ az aks enable-addons -a monitoring --name ${AKS_TARGET} --resource-group ${AZ_RE
 # Configure local kubectl to connect to our AKS cluster
 az aks get-credentials --name ${AKS_TARGET} --resource-group ${AZ_RESOURCE}
 
-# Test connection to the AKS CLuster using kubectl
-kubectl get nodes
-
-# Scale to [n] nodes
+# Scale to [n] nodes if needed
 az aks scale -c 1 -g ${AZ_RESOURCE} -n ${AKS_TARGET} | jq .fqdn
 kubectl get nodes

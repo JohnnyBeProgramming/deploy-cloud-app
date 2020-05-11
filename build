@@ -3,6 +3,23 @@
 set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
-pushd ./app
+pushd ./app > /dev/null
 
-docker build -t ${REGISTRY}/${IMAGE_ID} .
+case ${CLOUD_PROVIDER:-} in
+  azure)
+    # Building images using the Azure Cloud
+    az acr build -t ${IMAGE_ID} -r ${ACR_NAME} -f Dockerfile .
+    ;;
+  down)
+    # Building images using the AWS Cloud
+    exit 1;
+    ;;
+  test)
+    # Building images using the Google Cloud
+    exit 1;
+    ;;
+  *)
+    # Default: Build image using local docker
+    docker build -t ${REGISTRY}/${IMAGE_ID} .
+    ;;
+esac

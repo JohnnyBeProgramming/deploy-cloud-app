@@ -8,7 +8,7 @@ count = 0
 def index():
     global count
     count += 1
-    return 'Hello from application ' + str(count)
+    return '[v2] Hello from application ' + str(count)
     #return 'Goodbye from application ' + str(count)
 
 if __name__ == '__main__':

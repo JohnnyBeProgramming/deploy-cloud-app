@@ -1,0 +1,9 @@
+#!/bin/bash
+# -----------------------------------------------------------------------------
+set -euo pipefail # Stop running the script on first error...
+# -----------------------------------------------------------------------------
+source .env
+
+kubectl delete service ${PROJECT} --wait
+kubectl delete deployment ${PROJECT} --wait
+kubectl get service
