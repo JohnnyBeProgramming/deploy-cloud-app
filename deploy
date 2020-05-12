@@ -4,7 +4,20 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
 
-# Deploy a sample application to the target K8S cluster that we provisioned
-kubectl create deployment ${PROJECT} --image=${REGISTRY}/${IMAGE_ID} --dry-run=true -o yaml | kubectl apply --wait -f -
-kubectl expose deployment ${PROJECT} --type=LoadBalancer --port 5000 --target-port 5000 --dry-run=true -o yaml | kubectl apply --wait -f -
-kubectl get service
+# Build and download all the helm dependencies
+helm dep update ./helm/demo-app
+
+# Deploy the helm chart to the target cluster
+helm upgrade \
+    --install ${PROJECT} \
+    --namespace default \
+    ./helm/demo-app \
+    --set-string "app.name=${PROJECT}" \
+    --set-string "app.image=${REGISTRY}/${IMAGE_ID}" \
+    --wait --force
+
+
+# Or you can deploy a sample application to the target K8S cluster that we provisioned
+# kubectl create deployment ${PROJECT} --image=${REGISTRY}/${IMAGE_ID} --dry-run=true -o yaml | kubectl apply --wait -f -
+# kubectl expose deployment ${PROJECT} --type=LoadBalancer --port 5000 --target-port 5000 --dry-run=true -o yaml | kubectl apply --wait -f -
+# kubectl get service
