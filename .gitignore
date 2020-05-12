@@ -1,3 +1,6 @@
 .target
 
 helm/**/charts
+node_modules
+bin
+obj
