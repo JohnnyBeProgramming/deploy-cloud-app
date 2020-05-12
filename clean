@@ -4,6 +4,7 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
 
+# Remove the deployed resources
 kubectl delete service ${PROJECT} --wait
 kubectl delete deployment ${PROJECT} --wait
 kubectl get service

@@ -4,4 +4,5 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
 
+# Push the image tag to the remote registry
 docker push ${REGISTRY}/${IMAGE_ID}

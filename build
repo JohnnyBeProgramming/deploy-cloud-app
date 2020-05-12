@@ -3,20 +3,15 @@
 set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
+
+# Navigate to artifact source folder
 pushd ./app > /dev/null
 
+# Check for cloud-specific builds, otherwise use docker build
 case ${CLOUD_PROVIDER:-} in
   azure)
     # Building images using the Azure Cloud
     az acr build -t ${IMAGE_ID} -r ${CLUSTER_TARGET} -f Dockerfile .
-    ;;
-  aws)
-    # Building images using the AWS Cloud
-    docker build -t ${REGISTRY}/${IMAGE_ID} .
-    ;;
-  google)
-    # Building images using the Google Cloud
-    docker build -t ${REGISTRY}/${IMAGE_ID} .
     ;;
   *)
     # Default: Build image using local docker
