@@ -5,7 +5,7 @@ set -euo pipefail # Stop running the script on first error...
 source .env
 
 # Delete the deployed helm chart
-helm del ${PROJECT} -n default
+helm del ${PROJECT} -n ${NAMESPACE}
 
 
 # Or you can remove the deployed resources manually

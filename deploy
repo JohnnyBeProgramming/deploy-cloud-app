@@ -8,13 +8,12 @@ source .env
 helm dep update ./helm/demo-app
 
 # Deploy the helm chart to the target cluster
-helm upgrade \
-    --install ${PROJECT} \
-    --namespace default \
+helm upgrade --install ${PROJECT} \
+    -n ${NAMESPACE} \
     ./helm/demo-app \
     --set-string "app.name=${PROJECT}" \
     --set-string "app.image=${REGISTRY}/${IMAGE_ID}" \
-    --wait --force
+    --wait --force -o json | jq .info
 
 
 # Or you can deploy a sample application to the target K8S cluster that we provisioned
