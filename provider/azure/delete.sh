@@ -6,7 +6,7 @@ set -euo pipefail # Stop running the script on first error...
 #  - http://azure.microsoft.com/
 # -----------------------------------------------------------------------------
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $DIR/../../config/azure.env
+source $DIR/../../config/azure/cloud.env
 
 
 # Login to Azure account

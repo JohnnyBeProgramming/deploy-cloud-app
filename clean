@@ -4,9 +4,18 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
 
-# Delete the deployed helm chart
-helm del ${PROJECT} -n ${NAMESPACE}
+clean() {
+    target=$1
 
+    # Delete the deployed helm chart (if exists)
+    if helm history -n ${NAMESPACE} ${target} > /dev/null 2>&1
+    then
+        helm del ${target} -n ${NAMESPACE}
+    fi
+}
+
+clean "storage"
+clean ${PROJECT}
 
 # Or you can remove the deployed resources manually
 # kubectl delete service ${PROJECT} --wait

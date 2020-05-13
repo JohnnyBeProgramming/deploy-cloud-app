@@ -4,7 +4,7 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 # Set up a cluster according to the environment
 # -----------------------------------------------------------------------------
-# Load env vars from file `../aws.env`
+# Load env vars from file `../aws/cloud.env`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [ -z "${1:-}" ]

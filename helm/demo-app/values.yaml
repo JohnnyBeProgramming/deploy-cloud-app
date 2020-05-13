@@ -9,12 +9,3 @@ app:
   image: docker.local/demo/demo-app:latest
   port: 5000
 
-storage:
-  name: demo-storage
-  type: ssd
-  size: 1GB
-  class:
-    provisioner: kubernetes.io/no-provisioner
-    volumeBindingMode: WaitForFirstConsumer
-    reclaimPolicy: Retain
-    parameters: {}

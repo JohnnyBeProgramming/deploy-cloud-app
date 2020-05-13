@@ -4,16 +4,31 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 source .env
 
-# Build and download all the helm dependencies
-helm dep update ./helm/demo-app
+deploy() {
+    target=$1
+    shift
 
-# Deploy the helm chart to the target cluster
-helm upgrade --install ${PROJECT} \
-    -n ${NAMESPACE} \
-    ./helm/demo-app \
-    --set-string "app.name=${PROJECT}" \
-    --set-string "app.image=${REGISTRY}/${IMAGE_ID}" \
-    --wait --force -o json | jq .info
+    # Build and download all the helm dependencies
+    helm dep update ./helm/$target
+
+    # Deploy the helm chart to the target cluster
+    helm upgrade --install $target \
+        -n ${NAMESPACE} \
+        ./helm/$target \
+        --set-string "app.name=${PROJECT}" \
+        --set-string "app.image=${REGISTRY}/${IMAGE_ID}" \
+        --values "./config/${CLOUD_PROVIDER}/values.yaml" \
+        $@
+}
+
+# Only install the storage bindings once (cannot be modified afterwards)
+if ! helm history "storage" > /dev/null 2>&1;
+then
+    deploy "storage"
+fi
+
+# Deploy our project that binds to the provided storage
+deploy ${PROJECT} --wait --force
 
 
 # Or you can deploy a sample application to the target K8S cluster that we provisioned

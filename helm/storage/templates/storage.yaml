@@ -1,0 +1,65 @@
+{{- if .Values.storage }}
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.storage.name }}-volume
+  labels:
+    helm.sh/chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    app.kubernetes.io/name: {{ .Values.app.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | default "0.0.0" | quote }}
+spec:
+  {{- with .Values.storage.accessModes }}
+  accessModes:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  storageClassName: {{ .Values.storage.name }}-sci
+  capacity:
+    storage: {{ .Values.storage.size }}
+  persistentVolumeReclaimPolicy: {{ .Values.storage.class.reclaimPolicy | default "Delete" }}
+  local:
+    path: /Users/zaloddjo/Working/tmp/app-demo/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - docker-desktop
+
+---
+
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ .Values.storage.name }}-sci
+  annotations:
+    storageclass.kubernetes.io/is-default-class: {{ .Values.storage.default | default "false" | quote }}
+  labels:
+    helm.sh/chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    app.kubernetes.io/name: {{ .Values.app.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | default "0.0.0" | quote }}
+{{- toYaml .Values.storage.class | nindent 0 }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.storage.name }}
+spec:
+  storageClassName: "{{ .Values.storage.name }}-sci"
+  {{- with .Values.storage.accessModes }}
+  accessModes:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.size }}
+
+{{- end }}

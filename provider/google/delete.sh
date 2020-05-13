@@ -6,7 +6,7 @@ set -euo pipefail # Stop running the script on first error...
 #  - http://cloud.google.com/
 s# -----------------------------------------------------------------------------
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $DIR/../../config/google.env
+source $DIR/../../config/google/cloud.env
 
 
 

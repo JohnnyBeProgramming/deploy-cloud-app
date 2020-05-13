@@ -1,0 +1,12 @@
+storage:
+  name: demo-storage
+  type: ssd
+  size: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  class:
+    provisioner: kubernetes.io/no-provisioner
+    volumeBindingMode: WaitForFirstConsumer
+    reclaimPolicy: Delete
+    parameters: {}
+  default: false

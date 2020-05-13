@@ -6,7 +6,7 @@ set -euo pipefail # Stop running the script on first error...
 #  - https://www.docker.com/products/docker-desktop
 # -----------------------------------------------------------------------------
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $DIR/../../config/local.env
+source $DIR/../../config/local/cloud.env
 
 # Initialise tooling and local kubernetes cluster
 #  -> https://www.techrepublic.com/article/how-to-add-kubernetes-support-to-docker-desktop/

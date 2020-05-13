@@ -9,9 +9,7 @@ metadata:
     app.kubernetes.io/name: {{ .Values.app.name }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- if .Chart.AppVersion }}
-    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-    {{- end }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | default "0.0.0" | quote }}
 spec:
   replicas: {{ .Values.replicaCount }} # Set the replica count
   selector:
@@ -24,16 +22,24 @@ spec:
         app.kubernetes.io/name: {{ .Values.app.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-
+      # Declare storage volume bindings
+      {{- if .Values.storage }}
+      volumes:
+        - name: pod-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.name }}
+      {{- end }}
+      
       # Declare the pods that we want to deploy...
       containers:
         - name: {{ .Chart.Name }}-app
           image: "{{ .Values.app.image }}"
           imagePullPolicy: {{ .Values.app.pullPolicy | default "IfNotPresent" }}
+          {{- if .Values.storage }}
+          volumeMounts:
+            - mountPath: "/data"
+              name: pod-data
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.app.port | default 5000 }}
@@ -50,6 +56,10 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
 
       # Additional configurations for the pod and cluster
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

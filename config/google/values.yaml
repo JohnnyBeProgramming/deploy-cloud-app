@@ -1,0 +1,7 @@
+# Helm deployment overrides for this cloud provider
+storage: 
+  provisioner: kubernetes.io/gce-pd
+  volumeBindingMode: WaitForFirstConsumer
+  parameters:
+    type: pd-ssd
+    replication-type: none

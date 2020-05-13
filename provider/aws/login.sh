@@ -8,9 +8,9 @@ set -euo pipefail # Stop running the script on first error...
 #  - https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
 #  - https://eksctl.io/introduction/#installation
 # -----------------------------------------------------------------------------
-# Load env vars from file `../aws.env`
+# Load env vars from file `../aws/cloud.env`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $DIR/../../config/aws.env
+source $DIR/../../config/aws/cloud.env
 
 
 # Test connection
