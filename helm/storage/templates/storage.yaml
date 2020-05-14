@@ -19,7 +19,9 @@ spec:
   capacity:
     storage: {{ .Values.storage.size }}
   persistentVolumeReclaimPolicy: {{ .Values.storage.class.reclaimPolicy | default "Delete" }}  
-  {{- toYaml .Values.storage.volume | nindent 2 }}
+  {{- with .Values.storage.volume }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
 
 ---
 

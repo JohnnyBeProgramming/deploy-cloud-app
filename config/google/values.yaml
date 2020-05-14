@@ -1,7 +1,20 @@
 # Helm deployment overrides for this cloud provider
-storage: 
-  provisioner: kubernetes.io/gce-pd
-  volumeBindingMode: WaitForFirstConsumer
-  parameters:
-    type: pd-ssd
-    replication-type: none
+environment: "google"
+
+storage:
+  bind: true
+  name: demo-storage
+  size: 1Gi
+  default: false
+  accessModes:
+    - ReadWriteOnce
+  class:
+    provisioner: kubernetes.io/gce-pd
+    volumeBindingMode: WaitForFirstConsumer
+    reclaimPolicy: Delete
+    parameters:
+      type: pd-ssd
+      replication-type: none
+  volume:
+    gcePersistentDisk:  
+      pdName: demo-volume

@@ -4,22 +4,9 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 # Set up a cluster according to the environment
 # -----------------------------------------------------------------------------
-# Load env vars from file `../aws/cloud.env`
+# Load env vars from file `../.env`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source $DIR/../.env
 
-if [ -z "${1:-}" ]
-then
-    echo ""
-    echo "Usage:"
-    echo " $0 <local|azure|aws|google>"
-    echo ""
-    exit 1
-else    
-    # Replace the cloud provider    
-    echo $1 > .target
-    source $DIR/../.env
-    
-    # Show updated settings
-    echo "Selected '${CLOUD_PROVIDER:-empty}' cloud provider."
-    $DIR/status
-fi
+. $DIR/${CLOUD_PROVIDER}/destroy.sh
+

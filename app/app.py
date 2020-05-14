@@ -17,6 +17,7 @@ def index():
     return jsonify(
         project=os.environ.get('PROJECT'),
         version=os.environ.get('VERSION'),
+        provider=os.environ.get('PROVIDER'),
         hostname=socket.gethostname(),
         counter=count
     )

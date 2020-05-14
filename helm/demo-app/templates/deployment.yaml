@@ -40,6 +40,8 @@ spec:
               value: {{ .Chart.Version }}
             - name: PROJECT
               value: {{ .Chart.Name }}            
+            - name: PROVIDER
+              value: {{ .Values.environment | default "production" }}            
             - name: DATA_PATH
               value: /data
           {{- if .Values.storage.bind }}

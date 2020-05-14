@@ -16,6 +16,10 @@ source $DIR/../../config/local/cloud.env
 # -> No image registry needed for local.
 
 
+# In local mode, no need to define any storage
+# -> No storage resources needed for local.
+
+
 # Make sure we are configured to point to the correct cluster
 kubectl config use-context docker-desktop
 

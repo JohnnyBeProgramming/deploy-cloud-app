@@ -10,7 +10,7 @@ deploy() {
 
     # Build and download all the helm dependencies
     helm dep update ./helm/$target
-
+    
     # Deploy the helm chart to the target cluster
     helm upgrade --install $target \
         -n ${NAMESPACE} \

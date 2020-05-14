@@ -10,16 +10,20 @@ source $DIR/../.env
 
 jq . << EOF
 {
-    "version": "${VERSION}",
-    "project": "${PROJECT}",
-    "cluster": {        
-        "vendor": "${CLOUD_PROVIDER}",
-        "region": "${CLUSTER_REGION}",
-        "target": "${CLUSTER_TARGET}",
-        "deploy": {
-            "artifact": "${ARTIFACT}",
-            "registry": "${REGISTRY}"
-        }
-    }    
+    "vendor": "${CLOUD_PROVIDER}",
+    "region": "${CLUSTER_REGION}",
+    "target": "${CLUSTER_TARGET}",
+    "deploy": {
+        "version": "${VERSION}",
+        "project": "${PROJECT}",    
+        "artifact": "${ARTIFACT}",
+        "registry": "${REGISTRY}"
+    },
+    "online": {
+        "storage": null,
+        "registry": null,
+        "cluster": null,
+        "hostname": null
+    }
 }
 EOF
