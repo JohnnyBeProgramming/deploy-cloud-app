@@ -9,3 +9,5 @@ app:
   image: docker.local/demo/demo-app:latest
   port: 5000
 
+storage:
+  bind: false

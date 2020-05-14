@@ -1,4 +1,4 @@
-{{- if .Values.storage }}
+{{- if .Values.storage.bind }}
 
 apiVersion: v1
 kind: PersistentVolume
@@ -18,17 +18,8 @@ spec:
   storageClassName: {{ .Values.storage.name }}-sci
   capacity:
     storage: {{ .Values.storage.size }}
-  persistentVolumeReclaimPolicy: {{ .Values.storage.class.reclaimPolicy | default "Delete" }}
-  local:
-    path: /Users/zaloddjo/Working/tmp/app-demo/data
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - docker-desktop
+  persistentVolumeReclaimPolicy: {{ .Values.storage.class.reclaimPolicy | default "Delete" }}  
+  {{- toYaml .Values.storage.volume | nindent 2 }}
 
 ---
 

@@ -1,7 +1,10 @@
+environment: "local"
+
 storage:
+  bind: true
   name: demo-storage
-  type: ssd
   size: 1Gi
+  default: false
   accessModes:
     - ReadWriteOnce
   class:
@@ -9,4 +12,14 @@ storage:
     volumeBindingMode: WaitForFirstConsumer
     reclaimPolicy: Delete
     parameters: {}
-  default: false
+  volume:
+    local:
+      path: /tmp/data
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - docker-desktop

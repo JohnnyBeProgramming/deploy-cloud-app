@@ -6,7 +6,6 @@ replicaCount: 1
 
 storage:
   name: demo-storage
-  type: ssd
   size: 1Gi
   accessModes:
     - ReadWriteOnce

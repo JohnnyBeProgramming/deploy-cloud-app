@@ -23,7 +23,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       # Declare storage volume bindings
-      {{- if .Values.storage }}
+      {{- if .Values.storage.bind }}
       volumes:
         - name: pod-data
           persistentVolumeClaim:
@@ -35,7 +35,14 @@ spec:
         - name: {{ .Chart.Name }}-app
           image: "{{ .Values.app.image }}"
           imagePullPolicy: {{ .Values.app.pullPolicy | default "IfNotPresent" }}
-          {{- if .Values.storage }}
+          env:
+            - name: VERSION
+              value: {{ .Chart.Version }}
+            - name: PROJECT
+              value: {{ .Chart.Name }}            
+            - name: DATA_PATH
+              value: /data
+          {{- if .Values.storage.bind }}
           volumeMounts:
             - mountPath: "/data"
               name: pod-data
