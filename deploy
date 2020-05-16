@@ -40,8 +40,10 @@ fi
 deploy ${PROJECT} --wait --force
 
 # Show the publically accessable URL
-BASE_URL="http://$(kubectl get service demo-app-svc -o json | jq -r '.status.loadBalancer.ingress[].ip')"
-printf "\n -> Check out demo at: $BASE_URL:5000/ \n\n"
+BASE_URL=
+: ${BASE_URL:=$(kubectl get service demo-app-svc -o json | jq -r '.status.loadBalancer.ingress[].ip' | sed 's/null//' | tr -d '\n')}
+: ${BASE_URL:=$(kubectl get service demo-app-svc -o json | jq -r '.status.loadBalancer.ingress[].hostname' | sed 's/null//' | tr -d '\n')}
+printf "\n -> Check out demo at: http://$BASE_URL:5000/ \n\n"
 
 
 # Or you can deploy a sample application to the target K8S cluster that we provisioned

@@ -6,7 +6,12 @@ set -euo pipefail # Stop running the script on first error...
 #  - https://www.docker.com/products/docker-desktop
 # -----------------------------------------------------------------------------
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $DIR/../../config/local/cloud.env
+CFG="$( cd $DIR/../../config/ && pwd )/local"
+source $CFG/cloud.env
+
+# Define local deployment settings
+echo "" > $CFG/deploy.ini # Init file...
+echo "storage.volume.local.path=$( cd $DIR/../../data && pwd )" >> $CFG/deploy.ini
 
 # Initialise tooling and local kubernetes cluster
 #  -> https://www.techrepublic.com/article/how-to-add-kubernetes-support-to-docker-desktop/

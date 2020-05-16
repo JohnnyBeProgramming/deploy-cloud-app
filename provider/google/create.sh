@@ -6,7 +6,11 @@ set -euo pipefail # Stop running the script on first error...
 #  - http://cloud.google.com/
 # -----------------------------------------------------------------------------
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" 2>&1 >/dev/null && pwd )"
-source $DIR/../../config/google/cloud.env
+CFG="$( cd $DIR/../../config/ && pwd )/google"
+source $CFG/cloud.env
+
+# Define new deployment settings
+echo "" > $CFG/deploy.ini
 
 # Initialise tooling
 # curl https://sdk.cloud.google.com | bash

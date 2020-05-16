@@ -10,7 +10,13 @@ set -euo pipefail # Stop running the script on first error...
 # -----------------------------------------------------------------------------
 # Load env vars from file `../aws/cloud.env`
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $DIR/../../config/aws/cloud.env
+CFG="$( cd $DIR/../../config/ && pwd )/aws"
+source $CFG/cloud.env
+
+# Define new deployment settings
+echo "" > $CFG/deploy.ini
+
+
 . $DIR/login.sh # Make sure we are logged in
 source ~/.aws/mfa
 

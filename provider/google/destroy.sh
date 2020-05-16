@@ -30,3 +30,8 @@ fi
 
 # Delete the entire project
 gcloud projects delete ${GOOGLE_PROJECT}
+
+
+# Remove the deployment config
+check_file="$DIR/../../config/google/deploy.ini"
+[ -f $check_file ] && rm -f $check_file

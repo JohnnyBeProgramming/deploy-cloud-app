@@ -45,8 +45,6 @@ then
 fi
 
 
-# Remove the deployment parameters
-if [ -f $DIR/../../config/azure/deploy.env ]
-then
-    rm -f $DIR/../../config/azure/deploy.env
-fi
+# Remove the deployment config
+check_file="$DIR/../../config/azure/deploy.ini"
+[ -f $check_file ] && rm -f $check_file

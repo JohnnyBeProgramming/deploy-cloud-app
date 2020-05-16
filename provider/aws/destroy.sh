@@ -30,6 +30,10 @@ then
     aws ecr delete-repository --repository-name ${ARTIFACT} --force | jq -r '.repositories[].repositoryUri'
 fi
 
+# Remove the deployment config
+check_file="$DIR/../../config/aws/deploy.ini"
+[ -f $check_file ] && rm -f $check_file
+
 
 # Make sure that the kube context was unset
 kubectl config current-context || true
