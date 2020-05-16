@@ -1,0 +1,24 @@
+# Helm deployment overrides for this cloud provider
+environment: "azure"
+
+storage:
+  bind: true
+  name: demo-storage
+  size: 5Gi
+  default: false
+  accessModes:
+    - ReadWriteOnce
+  class:
+    provisioner: kubernetes.io/azure-disk
+    volumeBindingMode: WaitForFirstConsumer
+    reclaimPolicy: Delete
+    parameters:
+      storageaccounttype: Standard_LRS
+      kind: Managed
+  volume:
+    volumeMode: Filesystem
+    azureDisk:
+      kind: Managed
+      diskName: demo-volume
+      #diskURI: /subscriptions/<your-subscription>/resourceGroups/<resource>/providers/Microsoft.Compute/disks/demo-volume
+

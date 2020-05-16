@@ -8,7 +8,8 @@ source .env
 pushd ./app > /dev/null
 
 # Check for cloud-specific builds, otherwise use docker build
-case ${CLOUD_PROVIDER:-} in
+option=${1:-$CLOUD_PROVIDER}
+case ${option:-} in
   azure)
     # Building images using the Azure Cloud
     az acr build -t ${IMAGE_ID} -r ${CLUSTER_TARGET} -f Dockerfile .

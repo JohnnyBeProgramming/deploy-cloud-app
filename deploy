@@ -7,18 +7,27 @@ source .env
 deploy() {
     target=$1
     shift
-
+    
     # Build and download all the helm dependencies
     helm dep update ./helm/$target
     
-    # Deploy the helm chart to the target cluster
-    helm upgrade --install $target \
-        -n ${NAMESPACE} \
-        ./helm/$target \
-        --set-string "app.name=${PROJECT}" \
-        --set-string "app.image=${REGISTRY}/${IMAGE_ID}" \
-        --values "./config/${CLOUD_PROVIDER}/values.yaml" \
-        $@
+    DEPLOY_ARGS=$(cat ./config/${CLOUD_PROVIDER}/deploy.ini \
+        | sed '/^[[:space:]]*$/d' \
+        | sed 's/^/--set-string "/' \
+        | sed 's/$/"/' \
+        | tr '\n' ' ' \
+    )
+    sh << EOF
+        helm upgrade --install $target \
+            -n ${NAMESPACE} \
+            ./helm/$target \
+            --set-string "app.name=${PROJECT}" \
+            --set-string "app.image=${REGISTRY}/${IMAGE_ID}" \
+            --values "./config/${CLOUD_PROVIDER}/values.yaml" \
+            $(cat ./config/${CLOUD_PROVIDER}/deploy.ini | sed '/^[[:space:]]*$/d' | sed 's/^/--set-string "/' | sed 's/$/"/' | tr '\n' ' ') \
+            $DEPLOY_ARGS \
+            $@
+EOF
 }
 
 # Only install the storage bindings once (cannot be modified afterwards)
@@ -29,6 +38,10 @@ fi
 
 # Deploy our project that binds to the provided storage
 deploy ${PROJECT} --wait --force
+
+# Show the publically accessable URL
+BASE_URL="http://$(kubectl get service demo-app-svc -o json | jq -r '.status.loadBalancer.ingress[].ip')"
+printf "\n -> Check out demo at: $BASE_URL:5000/ \n\n"
 
 
 # Or you can deploy a sample application to the target K8S cluster that we provisioned
