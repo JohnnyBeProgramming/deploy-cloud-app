@@ -1,4 +1,9 @@
 .target
 
-helm/**/charts
+helm/**/charts/
+dist/
+*.tgz
+*.log
+*.log.[0-9]*
+config/**/secrets.yaml
 config/**/deploy.ini
