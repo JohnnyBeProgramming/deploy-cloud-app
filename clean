@@ -38,6 +38,12 @@ bootstrap() {
             clean "green-app"
             clean "blue-app"
             clean "storage"
+            
+            # Delete the public endpoint after all other resources are removed
+            if kubectl get service ${PROJECT}-public > /dev/null 2>&1
+            then
+                kubectl delete service ${PROJECT}-public --wait
+            fi
         ;;
     esac
 }

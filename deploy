@@ -40,18 +40,49 @@ storage() {
     fi
 }
 
+publish_apps() {
+    # Create or update the publicly exposed service to serve all released deployments
+    PUBLISH_PORT=${PUBLISH_PORT:-8080}
+    cat << EOF | kubectl apply --wait -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${PROJECT}-public
+spec:
+  type: LoadBalancer
+  ports:
+    - port: ${PUBLISH_PORT}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/instance: ${PROJECT}
+    app.kubernetes.io/released: "true"
+status:
+  loadBalancer: {}
+EOF
+}
+
 bootstrap() {
     DEPLOY_TARGET=${1:-blue}
     DEPLOY_PORT=${PORT:-8080}
+    PUBLISH_APP=false
     case ${DEPLOY_TARGET:-} in
         blue)
-            DEPLOY_PORT=8080
+            DEPLOY_PORT=8079
+            PUBLISH_APP=true
         ;;
         green)
             DEPLOY_PORT=8081
+            PUBLISH_APP=false
         ;;
         canary)
             DEPLOY_PORT=8088
+            PUBLISH_APP=true
+        ;;
+        release)
+            publish_apps
+            exit 0
         ;;
         *)
             # Default: Remove all known deployments (if they exist)
@@ -67,13 +98,21 @@ bootstrap() {
     --set-string "app.name=${DEPLOY_TARGET}-app" \
     --set-string "app.port=${DEPLOY_PORT}" \
     --set-string "app.variant=${DEPLOY_TARGET}" \
+    --set-string "publish=${PUBLISH_APP:-}" \
     --wait --force
     
+    if [ "${PUBLISH_APP:-}" = "true" ]
+    then
+        publish_apps
+    fi
+    
     # Show the publically accessable URL
+    RELEASED=$(kubectl get pods -n ${NAMESPACE} -l 'app.kubernetes.io/released in (true)' -o json | jq -r '.items[]' | jq -r '.metadata.labels["app.kubernetes.io/name"]' | tr -s '\n' ',' | sed 's/,$//')
     BASE_URL=
     : ${BASE_URL:=$(kubectl get service ${DEPLOY_TARGET}-app-svc -o json | jq -r '.status.loadBalancer.ingress[].ip' | sed 's/null//' | tr -d '\n')}
     : ${BASE_URL:=$(kubectl get service ${DEPLOY_TARGET}-app-svc -o json | jq -r '.status.loadBalancer.ingress[].hostname' | sed 's/null//' | tr -d '\n')}
-    printf "\n -> Check out demo at: http://$BASE_URL:$DEPLOY_PORT/ \n\n"
+    printf "\n -> Deployed instance: http://$BASE_URL:$DEPLOY_PORT/       <-- (${DEPLOY_TARGET} only) "
+    printf "\n -> Released endpoint: http://$BASE_URL:$PUBLISH_PORT/       <-- (released: ${RELEASED:-none}) \n\n"
 }
 
 # Start the application deployment

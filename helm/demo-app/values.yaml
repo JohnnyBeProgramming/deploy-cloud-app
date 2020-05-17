@@ -5,9 +5,12 @@ environment: "demo"
 replicaCount: 1
 
 app:
+  port: 5000  
   name: demo-app
   image: docker.local/demo/demo-app:latest
-  port: 5000
+  variant: blue
+
+publish: false   # <-- If set by the deployment, exposes app to public endpoint
 
 storage:
   bind: false
