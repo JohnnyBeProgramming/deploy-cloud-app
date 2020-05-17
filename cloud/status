@@ -18,12 +18,6 @@ jq . << EOF
         "project": "${PROJECT}",    
         "artifact": "${ARTIFACT}",
         "registry": "${REGISTRY}"
-    },
-    "online": {
-        "storage": null,
-        "registry": null,
-        "cluster": null,
-        "hostname": null
     }
 }
 EOF
