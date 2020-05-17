@@ -14,7 +14,7 @@ storage:
     parameters: {}
   volume:
     local:
-      path: /tmp/data
+      path: /tmp/data    # <-- Will be replaced by values in deploy.ini
     nodeAffinity:
       required:
         nodeSelectorTerms:

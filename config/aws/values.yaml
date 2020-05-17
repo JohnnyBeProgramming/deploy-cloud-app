@@ -1,0 +1,18 @@
+environment: "aws"
+
+storage:
+  bind: true
+  name: demo-storage
+  size: 1Gi
+  default: false
+  accessModes:
+    - ReadWriteOnce
+  class:
+    provisioner: efs.csi.aws.com
+    volumeBindingMode: WaitForFirstConsumer
+    reclaimPolicy: Delete
+    parameters: {}
+  volume:
+    csi:
+      driver: efs.csi.aws.com
+      #volumeHandle: <FileSystemId>   <-- Will be replaced by values in deploy.ini

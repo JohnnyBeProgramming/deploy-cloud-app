@@ -9,11 +9,34 @@ set -euo pipefail # Stop running the script on first error...
 #  - https://eksctl.io/introduction/#installation
 # -----------------------------------------------------------------------------
 # Load env vars from file `../aws/cloud.env`
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" 2>&1 > /dev/null && pwd )"
 source $DIR/../../config/aws/cloud.env
 . $DIR/login.sh # Make sure we are logged in
 source ~/.aws/mfa
 
+
+# Delete the volume mount points and targets
+EFS_VOL_ID=$(aws efs describe-file-systems --creation-token "demo-volume" --query "FileSystems[*].FileSystemId" | jq -r '.[]' | tr -s '\n' ',' | sed 's/,$//')
+if [ ! -z $EFS_VOL_ID ]
+then
+    aws efs describe-mount-targets \
+    --file-system-id ${EFS_VOL_ID} \
+    | jq -r '.MountTargets[]' \
+    | jq -r '.MountTargetId' \
+    | while IFS= read -r target_id; do
+        aws efs delete-mount-target --mount-target-id ${target_id}
+    done
+    
+    EC2_SEC_RES=$(aws ec2 describe-security-groups --filters Name=group-name,Values=${CLUSTER_TARGET} --query "SecurityGroups[*].{VPC:VpcId,ID:GroupId}" | jq -r '.[]')
+    if [ ! -z $(echo ${EC2_SEC_RES} | jq -r '.ID' 2> /dev/null)]
+    then
+        aws ec2 delete-security-group --group-id $(echo ${EC2_SEC_RES} | jq -r '.ID')
+    fi
+    
+    
+    # Remove the file system volume
+    aws efs delete-file-system --file-system-id ${EFS_VOL_ID}
+fi
 
 # Delete a AWS EKS cluster if exists
 if aws eks describe-cluster --name ${CLUSTER_TARGET} 2> /dev/null | jq .cluster.endpoint
