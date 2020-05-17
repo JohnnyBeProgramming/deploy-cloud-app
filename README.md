@@ -45,7 +45,7 @@ We also include a special provider to test and deploy locally:
 
 ## Building, publishing and deploying the sample app
 
-This repository includes a simple React `app` with a backing python `api` that we use to test the CI/CD pipeline steps. The app is packaged into a `helm` chart, and deployed to Kubernetes.
+This repository includes a simple React `app` with a backing python `api` that we use to test the CI/CD pipeline steps. The app is packaged into a `helm` chart, container images are pushed to a registry, and then deployed to Kubernetes.
 
 We include following sample pipeline steps to:
  - `./build` - container images (either locally or remote)
