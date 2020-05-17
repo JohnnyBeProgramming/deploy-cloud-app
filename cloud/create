@@ -8,5 +8,11 @@ set -euo pipefail # Stop running the script on first error...
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source $DIR/../.env
 
+if [ ! -z "${1:-}" ] && [ ! "${1:-}" = "${CLOUD_PROVIDER}" ]
+then
+    $DIR/select $1
+    source $DIR/../.env
+fi
+
 . $DIR/${CLOUD_PROVIDER}/create.sh
 
