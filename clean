@@ -6,7 +6,7 @@ source .env
 
 clean() {
     target=$1
-
+    
     # Delete the deployed helm chart (if exists)
     if helm history -n ${NAMESPACE} ${target} > /dev/null 2>&1
     then
@@ -14,8 +14,36 @@ clean() {
     fi
 }
 
-clean "storage"
-clean ${PROJECT}
+bootstrap() {
+    DEPLOY_TARGET=${1:-}
+    case ${DEPLOY_TARGET:-} in
+        storage)
+            clean "storage"
+        ;;
+        blue)
+            # Remove the primary deployment
+            clean "${DEPLOY_TARGET}-app"
+        ;;
+        green)
+            # Remove the secondary deployment
+            clean "${DEPLOY_TARGET}-app"
+        ;;
+        canary)
+            # Remove the canary deployment
+            clean "${DEPLOY_TARGET}-app"
+        ;;
+        *)
+            # Default: Remove all known deployments (if they exist)
+            clean "canary-app"
+            clean "green-app"
+            clean "blue-app"
+            clean "storage"
+        ;;
+    esac
+}
+
+# Bootstrap the cleaning process
+bootstrap $@
 
 # Or you can remove the deployed resources manually
 # kubectl delete service ${PROJECT} --wait

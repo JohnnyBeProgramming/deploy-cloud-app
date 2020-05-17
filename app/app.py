@@ -18,6 +18,7 @@ def index():
         project=os.environ.get('PROJECT'),
         version=os.environ.get('VERSION'),
         provider=os.environ.get('PROVIDER'),
+        variant=os.environ.get('VARIANT'),
         hostname=socket.gethostname(),
         counter=count
     )
@@ -65,4 +66,4 @@ def storage():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0',port=os.environ.get('PORT', 5000))

@@ -39,9 +39,13 @@ spec:
             - name: VERSION
               value: {{ .Chart.Version }}
             - name: PROJECT
-              value: {{ .Chart.Name }}            
+              value: {{ .Values.app.name }}
             - name: PROVIDER
               value: {{ .Values.environment | default "production" }}            
+            - name: VARIANT
+              value: {{ .Values.app.variant | default "blue" }}            
+            - name: PORT
+              value: {{ .Values.app.port | default 5000 | quote }}
             - name: DATA_PATH
               value: /data
           {{- if .Values.storage.bind }}
