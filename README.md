@@ -2,7 +2,7 @@
 
 Exploring different options and strategies for provisioning, publising and deploying applications to cloud provider(s) such as Google, AWS and Azure, using common tooling and application definitions. 
 
-A sample application is also provided, deployed with `helm` to the target Kubernetes cluster, as a bencmark to compare different environments. 
+A sample application is also provided, deployed with `helm` to the target Kubernetes cluster, as a bencmark, to compare different environments. 
 
 ## Provisioning a Kubernetes cluster
 For each major cloud provider, we can create a functioning `Kubernetes` cluster (+ backing registry / storage) with these simple commands:
