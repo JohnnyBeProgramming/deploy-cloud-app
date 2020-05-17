@@ -16,7 +16,8 @@ For each major cloud provider, we can create a functioning `Kubernetes` cluster 
 
 # Settings defined in `./config/<target>/cloud.env`
 
-./cloud/select local  # Use docker for desktop...
+# Use docker for desktop for local development...
+./cloud/select local 
 
 ```
 
