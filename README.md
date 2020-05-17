@@ -31,7 +31,7 @@ We focus on provisioning 3 types of cloud resources:
  - `Kubernetes` - Create and configure fully operational cluster and link to `kubectl`
 
  
-### Target cloud providers
+### Breakdown of resources per cloud provider
 
 We chose to include all the major cloud providers, and used the offerings for each of them:
 
