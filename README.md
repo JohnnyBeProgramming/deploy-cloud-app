@@ -15,7 +15,12 @@ For each major cloud provider, we can create a functioning `Kubernetes` cluster 
 ./cloud/delete [ local | aws | azure | google ]
 
 # Settings defined in `./config/<target>/cloud.env`
+
+./cloud/select local  # Use docker for desktop...
+
 ```
+
+We also include a special cloud provider called `local`, that will use your local `docker-desktop` (if installed) as the target cluster, instead of creating new resources in a cloud. 
 
 The CLI tooling used to provision and configure each of these cloud providers differ substantially. To overcome these differences, we use a combination of shell scripts and configuration files, defined per provider.
 
@@ -25,13 +30,6 @@ We focus on provisioning 3 types of cloud resources:
  - `Kubernetes` - Create and configure fully operational cluster and link to `kubectl`
 
  
-
-We also include a special cloud provider called `local`, that will use your local `docker-desktop` (if installed) as the target cluster, instead of creating new resources in a cloud. 
-
-```
-./cloud/select local  # Use docker for desktop...
-```
-
 ### Target cloud providers
 
 We chose to include all the major cloud providers, and used the offerings for each of them:
