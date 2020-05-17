@@ -5,7 +5,7 @@ Exploring different options and strategies for provisioning, publising and deplo
 A sample application is also provided, deployed with `helm` to the target Kubernetes cluster, as a bencmark, to compare different environments. 
 
 ## Provisioning a Kubernetes cluster
-For each major cloud provider, we can create a functioning `Kubernetes` cluster (+ backing registry / storage) with these simple commands:
+For each major cloud provider, we can create a functioning `Kubernetes` cluster (+ backing registry / storage) with these simple commands (they have been tested with Free Tier accounts on each cloud):
 ```
 # Create, destroy or select a target cloud provider
 # It will remember your last choice, default is `local`
