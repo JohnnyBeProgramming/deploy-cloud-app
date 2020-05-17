@@ -5,7 +5,7 @@ set -euo pipefail # Stop running the script on first error...
 source .env
 
 # Navigate to artifact source folder
-pushd ./app > /dev/null
+pushd ./api > /dev/null
 
 # Check for cloud-specific builds, otherwise use docker build
 option=${1:-$CLOUD_PROVIDER}
