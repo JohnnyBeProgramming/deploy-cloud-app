@@ -7,6 +7,12 @@ source .env
 NUM_PODS=${1:?"Please specify the number of pods as the first argument"}
 
 # Scale it up to multiple replicas
-kubectl scale deployment ${PROJECT} --replicas=${NUM_PODS} -o yaml | kubectl apply --wait -f -
-kubectl wait --for=condition=available --timeout=600s deployment/${PROJECT} -n default
-kubectl get pods
+kubectl scale deployment ${PROJECT} --replicas=${NUM_PODS} -o yaml \
+| kubectl apply --wait -o json -f - \
+| jq .status
+
+# Wait for deployment to finish and list all active pods in namespace
+kubectl wait --for=condition=available --timeout=600s deployment/${PROJECT} -n ${NAMESPACE}
+
+# Show current pods in namespace
+kubectl get pods --namespace ${NAMESPACE} 

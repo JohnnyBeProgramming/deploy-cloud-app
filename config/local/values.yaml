@@ -1,0 +1,25 @@
+environment: "local"
+
+storage:
+  bind: true
+  name: demo-storage
+  size: 1Gi
+  default: false
+  accessModes:
+    - ReadWriteOnce
+  class:
+    provisioner: kubernetes.io/no-provisioner
+    volumeBindingMode: WaitForFirstConsumer
+    reclaimPolicy: Delete
+    parameters: {}
+  volume:
+    local:
+      path: /tmp/data    # <-- Will be replaced by values in deploy.ini
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - docker-desktop

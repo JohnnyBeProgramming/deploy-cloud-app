@@ -9,9 +9,7 @@ metadata:
     app.kubernetes.io/name: {{ .Values.app.name }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- if .Chart.AppVersion }}
-    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-    {{- end }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | default "0.0.0" | quote }}
 spec:
   replicas: {{ .Values.replicaCount }} # Set the replica count
   selector:
@@ -24,19 +22,36 @@ spec:
         app.kubernetes.io/name: {{ .Values.app.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-
+      # Declare storage volume bindings
+      {{- if .Values.storage.bind }}
+      volumes:
+        - name: pod-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.name }}
+      {{- end }}
+      
       # Declare the pods that we want to deploy...
       containers:
         - name: {{ .Chart.Name }}-app
           image: "{{ .Values.app.image }}"
           imagePullPolicy: {{ .Values.app.pullPolicy | default "IfNotPresent" }}
+          env:
+            - name: VERSION
+              value: {{ .Chart.Version }}
+            - name: PROJECT
+              value: {{ .Chart.Name }}            
+            - name: PROVIDER
+              value: {{ .Values.environment | default "production" }}            
+            - name: DATA_PATH
+              value: /data
+          {{- if .Values.storage.bind }}
+          volumeMounts:
+            - mountPath: "/data"
+              name: pod-data
+          {{- end }}
           ports:
             - name: http
-              containerPort: 5000
+              containerPort: {{ .Values.app.port | default 5000 }}
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -50,6 +65,10 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
 
       # Additional configurations for the pod and cluster
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -62,34 +81,5 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
-
----
-
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-svc
-  labels:
-    helm.sh/chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-    app.kubernetes.io/name: {{ .Values.app.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- if .Chart.AppVersion }}
-    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-    {{- end }}
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 5000
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app.kubernetes.io/name: {{ .Values.app.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}    
-status:
-  loadBalancer: {}
 
 {{- end }}
