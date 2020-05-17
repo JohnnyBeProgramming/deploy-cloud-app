@@ -23,7 +23,7 @@ For each major cloud provider, we can create a functioning `Kubernetes` cluster 
 
 We also include a special cloud provider called `local`, that will use your local `docker-desktop` (if installed) as the target cluster, instead of creating new resources in a cloud. 
 
-The CLI tooling used to provision and configure each of these cloud providers differ substantially. Slight variations are also needed per cloud provider. To overcome these differences, we use a combination of shell scripts and configuration files, defined per provider.
+The CLI tooling used to provision and configure each of these cloud providers differ substantially. Slight variations in deployment settings are also needed per cloud provider. To overcome these differences, we use a combination of shell scripts and configuration files, defined per provider.
 
 We focus on provisioning 3 types of cloud resources:
  - `Storage` - Maps a disk volume to a Pod in K8S, and test disk R/W speeds
