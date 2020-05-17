@@ -31,7 +31,7 @@ def storage():
     if os.path.isdir(folderPath) is False:
         return "Folder {} does not exists".format(folderPath)
 
-    fileName = "{}.txt".format(str(uuid.uuid4()))
+    fileName = "{}-{}.txt".format(socket.gethostname(), str(uuid.uuid4()))
     filePath = "{}/{}".format(folderPath, fileName)
     totalBytes = 1024 * 1024 * 10
 
