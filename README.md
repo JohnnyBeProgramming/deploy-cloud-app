@@ -2,10 +2,10 @@
 
 Exploring different options and strategies for provisioning, publising and deploying applications to cloud provider(s) such as Google, AWS and Azure, using common tooling and application definitions. 
 
-A sample application is also provided, deployed with `helm` to the target Kubernetes cluster, as a bencmark to compare different environments. 
+A sample application is also provided, deployed with `helm` to the target Kubernetes cluster, as a bencmark, to compare different environments. 
 
 ## Provisioning a Kubernetes cluster
-For each major cloud provider, we can create a functioning `Kubernetes` cluster (+ backing registry / storage) with these simple commands:
+For each major cloud provider, we can create a functioning `Kubernetes` cluster (+ backing registry / storage) with these simple commands (they have been tested with Free Tier accounts on each cloud):
 ```
 # Create, destroy or select a target cloud provider
 # It will remember your last choice, default is `local`
@@ -15,9 +15,15 @@ For each major cloud provider, we can create a functioning `Kubernetes` cluster 
 ./cloud/delete [ local | aws | azure | google ]
 
 # Settings defined in `./config/<target>/cloud.env`
+
+# Use docker for desktop for local development...
+./cloud/select local 
+
 ```
 
-The CLI tooling used to provision and configure each of these cloud providers differ substantially. To overcome these differences, we use a combination of shell scripts and configuration files, defined per provider.
+We also include a special cloud provider called `local`, that will use your local `docker-desktop` (if installed) as the target cluster, instead of creating new resources in a cloud. 
+
+The CLI tooling used to provision and configure each of these cloud providers differ substantially. Slight variations in deployment settings are also needed per cloud provider. To overcome these differences, we use a combination of shell scripts and configuration files, defined for each provider in `./(cloud|config)/<provider-name>/**`.
 
 We focus on provisioning 3 types of cloud resources:
  - `Storage` - Maps a disk volume to a Pod in K8S, and test disk R/W speeds
@@ -25,14 +31,7 @@ We focus on provisioning 3 types of cloud resources:
  - `Kubernetes` - Create and configure fully operational cluster and link to `kubectl`
 
  
-
-We also include a special cloud provider called `local`, that will use your local `docker-desktop` (if installed) as the target cluster, instead of creating new resources in a cloud. 
-
-```
-./cloud/select local  # Use docker for desktop...
-```
-
-### Target cloud providers
+### Breakdown of resources per cloud provider
 
 We chose to include all the major cloud providers, and used the offerings for each of them:
 
@@ -46,7 +45,7 @@ We also include a special provider to test and deploy locally:
 
 ## Building, publishing and deploying the sample app
 
-This repository includes a simple React `app` with a backing python `api` that we use to test the CI/CD pipeline steps. The app is packaged into a `helm` chart, and deployed to Kubernetes.
+This repository includes a simple React `app` with a backing python `api` that we use to test the CI/CD pipeline steps. The app is packaged into a `helm` chart, container images are pushed to a registry, and then deployed to Kubernetes.
 
 We include following sample pipeline steps to:
  - `./build` - container images (either locally or remote)
