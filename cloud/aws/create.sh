@@ -65,13 +65,17 @@ echo "meta.vpcid=${EKS_VPC_ID}" >> $CFG/deploy.ini
 echo "meta.cidrs=${EKS_VPC_CIDR}" >> $CFG/deploy.ini
 
 
+
 # Add Security group for EKS and FS
 EC2_SEC_RES=$(aws ec2 describe-security-groups --filters Name=group-name,Values=${CLUSTER_TARGET} Name=vpc-id,Values=${EKS_VPC_ID} --query "SecurityGroups[*].{Name:GroupName,ID:GroupId}" | jq -r '.[]')
-if echo ${EC2_SEC_RES} | jq .ID 2> /dev/null
-then
-    EC2_SEC_GRP=$(echo ${EC2_SEC_RES} | jq -r '.ID')
-else
+EC2_SEC_KEY=$(echo ${EC2_SEC_RES} | jq .ID 2> /dev/null)
+if [ -z $EC2_SEC_KEY ]
+then    
+    echo "Creating a new security group for '${CLUSTER_TARGET}' using VPC '${EKS_VPC_ID}'..."
     EC2_SEC_GRP=$(aws ec2 create-security-group --description "Allow EKS access to FS" --group-name ${CLUSTER_TARGET} --vpc-id ${EKS_VPC_ID} | jq -r '.GroupId')
+else
+    EC2_SEC_GRP=$(echo ${EC2_SEC_RES} | jq -r '.ID')
+    echo "Using security group: ${EC2_SEC_RES}"
 fi
 echo "meta.sec_group.name=${EC2_SEC_GRP}" >> $CFG/deploy.ini
 
@@ -92,19 +96,19 @@ fi
 
 
 # Create the filesystem and store the volume id
-if ! aws efs describe-file-systems --creation-token "demo-volume" 2>&1 >/dev/null
+EFS_CURRENT_FS=$(aws efs describe-file-systems --creation-token "${VOLUME_NAME}" | jq -r '.FileSystems[]' 2>/dev/null)
+if [ "${EFS_CURRENT_FS:-}" = "" ]
 then
-    aws efs create-file-system --creation-token "demo-volume"
+    echo "Creating new filesystem with token: ${VOLUME_NAME}"
+    aws efs create-file-system --creation-token "${VOLUME_NAME}"
 fi
-EFS_VOL_ID=$(aws efs describe-file-systems --creation-token "demo-volume" --query "FileSystems[*].FileSystemId" | jq -r '.[]' | tr -s '\n' ',' | sed 's/,$//')
+EFS_VOL_ID=$(aws efs describe-file-systems --creation-token "${VOLUME_NAME}" --query "FileSystems[*].FileSystemId" | jq -r '.[]' | tr -s '\n' ',' | sed 's/,$//')
 echo "storage.volume.csi.volumeHandle=${EFS_VOL_ID}" >> $CFG/deploy.ini
 
 
 # Add mount points to each subnet
-if ! aws efs describe-mount-targets \
---file-system-id ${EFS_VOL_ID} \
-| jq -r '.MountTargets[]' \
-| jq -r '.SubnetId' 2>&1 >/dev/null
+EFS_MOUNT_TARGETS=$(aws efs describe-mount-targets --file-system-id ${EFS_VOL_ID} | jq -r '.MountTargets[]' | jq -r '.SubnetId' 2>/dev/null)
+if [ "${EFS_MOUNT_TARGETS:-}" = "" ]
 then
     # https://aws.amazon.com/premiumsupport/knowledge-center/eks-persistent-storage/
     aws eks describe-cluster --name ${CLUSTER_TARGET} --query "cluster.resourcesVpcConfig" \
